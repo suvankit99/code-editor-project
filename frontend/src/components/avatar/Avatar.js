@@ -32,7 +32,7 @@ const AvatarComponent = ({ username }) => {
   }
   return (
     <div className="client-item">
-      <Avatar className="client-avatar" {...stringAvatar(username)}></Avatar>
+      <Avatar className="client-avatar" {...stringAvatar(username ? username : "")}></Avatar>
       <span>{username}</span>
     </div>
   );

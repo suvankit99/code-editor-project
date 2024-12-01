@@ -21,12 +21,37 @@ const io = new Server(server, {
   },
 });
 
+const socketToUserMap = {
+
+}; 
+
+function getAllConnectedClients(roomId){
+  return Array.from(io.sockets.adapter.rooms.get(roomId) || []).map(
+    (socketId) => {
+        return {
+            socketId,
+            username: socketToUserMap[socketId],
+        };
+    }
+);
+}
 // Handle client connections
 io.on('connection', (socket) => {
   console.log('Client connected:', socket.id);
+ 
+  socket.on(ACTIONS.JOIN , ({username , roomId}) => {
+    socketToUserMap[socket.id] = username ; 
+    socket.join(roomId) ; 
 
-  socket.on(ACTIONS.JOIN , () => {
-    
+    const clients = getAllConnectedClients(roomId);
+
+    clients.forEach(({socketId}) => {
+      io.to(socketId).emit(ACTIONS.JOINED , {
+        clients , 
+        username , 
+        joinedUserSocketId : socketId
+      })
+    })
   })
 });
 
