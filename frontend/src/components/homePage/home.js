@@ -10,7 +10,6 @@ const RoomForm = () => {
   const handleCreateRoom = () => {
     const newRoomId = uuidv4(); // Generate a new UUID
     setRoomId(newRoomId); // Update the state
-    console.log(`Room Created: ${newRoomId}, Username: ${username}`);
     toast.success("New room created")
   };
 

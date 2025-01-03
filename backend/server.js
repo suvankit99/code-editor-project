@@ -49,7 +49,7 @@ io.on('connection', (socket) => {
       io.to(socketId).emit(ACTIONS.JOINED , {
         clients , 
         username , 
-        joinedUserSocketId : socketId
+        joinedUserSocketId : socket.id
       })
     })
   })

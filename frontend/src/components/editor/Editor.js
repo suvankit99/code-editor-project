@@ -4,24 +4,25 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCode } from "@fortawesome/free-solid-svg-icons";
 import RealtimeEditor from "../realtimeEditor/RealtimeEditor"; // Import your RealtimeEditor component
 import "./Editor.css"; // Import external CSS file
-import Avatar from '../avatar/Avatar'
+import Avatar from "../avatar/Avatar";
 import { initSocket } from "../../socket";
-import { Navigate, useLocation, useNavigate, useParams } from "react-router-dom";
-import ACTIONS from '../../actions'
-import toast from "react-hot-toast";
-const Editor = () => {
-  const socketRef = useRef() ; 
-  const location = useLocation();
-  const navigate = useNavigate() ; 
-  const username = location.state?.username; // Safely access the username
-  const {roomId} = useParams() ; 
-  const [currentUserSocketID, setcurrentUserSocketID] = useState("")
+import {
+  Navigate,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
+import ACTIONS from "../../actions";
+import toast, { Toaster } from "react-hot-toast";
+import { io } from "socket.io-client";
 
-  const [clientList, setClientList] = useState([
-    { socketId: "1", name: "Alice" },
-    { socketId: "2", name: "Bob" },
-    { socketId: "3", name: "Charlie" },
-  ]);
+const Editor = () => {
+  const socketRef = useRef();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const username = location.state?.username; // Safely access the username
+  const { roomId } = useParams();
+  const [clientList, setClientList] = useState([]);
 
   const copyRoomId = () => {
     navigator.clipboard.writeText("ROOM_ID_1234"); // Replace with your actual room ID logic
@@ -32,40 +33,49 @@ const Editor = () => {
     alert("You have left the room."); // Replace with actual leave room logic
   };
   const handleSocketError = (err) => {
-    console.log('Socket error:', err);
-    toast.error('Socket connection failed. Please try again later.');
+    console.log("Socket error:", err);
+    toast.error("Socket connection failed. Please try again later.");
   };
   useEffect(() => {
     const init = async () => {
-      socketRef.current = await initSocket() ; 
+      socketRef.current = io(process.env.REACT_APP_BACKEND_URL);
+      socketRef.current.on("connect_error", handleSocketError);
+      socketRef.current.on("connect_failed", handleSocketError);
+      socketRef.current.emit(ACTIONS.JOIN, {
+        roomId,
+        username,
+      });
 
-      setcurrentUserSocketID(socketRef.current.id) ; 
+      socketRef.current.on(
+        ACTIONS.JOINED,
+        ({ clients, username, joinedUserSocketId }) => {
+          if (
+            username !== location.state?.username &&
+            socketRef.current.id !== joinedUserSocketId
+          ) {
+            console.log("toast called");
+            toast.success(`${username} has joined the room`);
+          }
 
-     // Handle socket connection errors
-     socketRef.current.on("connect_error", handleSocketError);
-     socketRef.current.on('connect_failed', handleSocketError);
-     socketRef.current.emit(ACTIONS.JOIN , {
-      roomId , 
-      username
-     })
-
-     socketRef.current.on(ACTIONS.JOINED , ({clients , username , joinedUserSocketId}) => {
-      setClientList(clients) ; 
-      if(joinedUserSocketId !== currentUserSocketID){
-        toast.success(`${username} has joined the room`) ; 
-      }
-     })
-
-     console.log("clientlist " , clientList)
-    }
-    init()
-    return () => {
-      // clean up socket coonection 
+          setClientList(clients);
+          console.log("clientlist ", clients);
+        }
+      );
     };
-  }, [])
-  
 
-  if(!roomId){
+    init();
+    return () => {
+      // clean up socket connection
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current.off(ACTIONS.JOIN);
+        socketRef.current.off(ACTIONS.JOINED);
+        socketRef.current.off(ACTIONS.DISCONNECTED);
+      }
+    };
+  }, []);
+
+  if (!roomId) {
     navigate("/");
   }
   return (
@@ -79,7 +89,9 @@ const Editor = () => {
           <div className="display-clients">
             <h3>Connected</h3>
             <div className="client-list">
-              {clientList.map((client) => <Avatar key={client.socketId}  username={client.username}/>)}
+              {clientList.map((client) => (
+                <Avatar key={client.socketId} username={client.username} />
+              ))}
             </div>
           </div>
         </div>
@@ -106,6 +118,7 @@ const Editor = () => {
       <div className="editor-area">
         <RealtimeEditor />
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 };
