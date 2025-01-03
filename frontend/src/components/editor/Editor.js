@@ -25,12 +25,11 @@ const Editor = () => {
   const [clientList, setClientList] = useState([]);
 
   const copyRoomId = () => {
-    navigator.clipboard.writeText("ROOM_ID_1234"); // Replace with your actual room ID logic
-    alert("Room ID copied to clipboard!");
+    navigator.clipboard.writeText(roomId); // Replace with your actual room ID logic
   };
 
   const leaveRoom = () => {
-    alert("You have left the room."); // Replace with actual leave room logic
+    navigate("/")
   };
   const handleSocketError = (err) => {
     console.log("Socket error:", err);
