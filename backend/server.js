@@ -53,6 +53,23 @@ io.on('connection', (socket) => {
       })
     })
   })
+
+
+  // disconnecting event is called 
+  socket.on('disconnecting', () => {
+    console.log("Disconnect called")
+    const rooms = [...socket.rooms] ; 
+    rooms.forEach((roomId) => {
+      socket.in(roomId).emit(ACTIONS.DISCONNECTED , {
+        socketId : socket.id , 
+        username : socketToUserMap[socket.id] 
+      })
+
+      socket.leave(roomId) ; 
+    })
+
+    delete socketToUserMap[socket.id] ;
+  })
 });
 
 const PORT = process.env.PORT || 5000 ; 

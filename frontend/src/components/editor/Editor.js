@@ -61,6 +61,11 @@ const Editor = () => {
           console.log("clientlist ", clients);
         }
       );
+
+      socketRef.current.on(ACTIONS.DISCONNECTED , ({socketId , username}) => {
+        toast.success(`${username} left the room`) ; 
+        setClientList((prev) => {return prev.filter(client => client.socketId !== socketId)})
+      })
     };
 
     init();
