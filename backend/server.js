@@ -76,6 +76,14 @@ io.on("connection", (socket) => {
       content,
     });
   });
+
+  
+  socket.on(ACTIONS.SYNC_CODE, ({ joinedUserSocketId, content }) => {
+    console.log("socket id : " , joinedUserSocketId , " content : " , content) ; 
+    io.to(joinedUserSocketId).emit(ACTIONS.CODE_CHANGE, {
+      content
+    });
+  });
 });
 
 const PORT = process.env.PORT || 5000;

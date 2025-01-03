@@ -18,6 +18,7 @@ import { io } from "socket.io-client";
 
 const Editor = () => {
   const socketRef = useRef();
+  const codeRef = useRef();
   const location = useLocation();
   const navigate = useNavigate();
   const username = location.state?.username; // Safely access the username
@@ -26,6 +27,7 @@ const Editor = () => {
 
   const copyRoomId = () => {
     navigator.clipboard.writeText(roomId); // Replace with your actual room ID logic
+    toast.success("Room id copied to your clipboard")
   };
 
   const leaveRoom = () => {
@@ -57,7 +59,10 @@ const Editor = () => {
           }
 
           setClientList(clients);
-          console.log("clientlist ", clients);
+          socketRef.current.emit(ACTIONS.SYNC_CODE, {
+            content : codeRef.current , 
+            joinedUserSocketId 
+          })
         }
       );
 
@@ -120,7 +125,7 @@ const Editor = () => {
 
       {/* Editor Area */}
       <div className="editor-area">
-        <RealtimeEditor socketRef={socketRef} roomId={roomId}/>
+        <RealtimeEditor socketRef={socketRef} roomId={roomId} syncCodeOnJoin={code => codeRef.current = code } />
       </div>
       <Toaster position="top-right" />
     </div>

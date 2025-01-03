@@ -9,7 +9,7 @@ import { bracketMatching, foldGutter } from '@codemirror/language';
 import { autocompletion } from '@codemirror/autocomplete';
 import ACTIONS from '../../actions';
 
-const RealtimeEditor = ({ socketRef, roomId }) => {
+const RealtimeEditor = ({ socketRef, roomId , syncCodeOnJoin }) => {
   const editorRef = useRef(null);
   const editorViewRef = useRef(null);
   const suppressEmit = useRef(false);
@@ -31,7 +31,7 @@ const RealtimeEditor = ({ socketRef, roomId }) => {
           if (update.docChanged && !suppressEmit.current) {
             const newContent = update.state.doc.toString();
             console.log('Document updated locally:', newContent);
-
+            syncCodeOnJoin(newContent) ; 
             if (socketRef.current) {
               socketRef.current.emit(ACTIONS.CODE_CHANGE, {
                 roomId,
@@ -59,10 +59,10 @@ const RealtimeEditor = ({ socketRef, roomId }) => {
       // Listen for CODE_CHANGE events
       const handleCodeChange = ({ content }) => {
         console.log('Received remote update:', content);
-
+        syncCodeOnJoin(content) ; 
         if (editorViewRef.current) {
           const currentDoc = editorViewRef.current.state.doc.toString();
-          if (currentDoc !== content) {
+          if (content && currentDoc !== content) {
             suppressEmit.current = true; // Prevent emitting during remote updates
             const transaction = editorViewRef.current.state.update({
               changes: { from: 0, to: currentDoc.length, insert: content },
@@ -76,7 +76,7 @@ const RealtimeEditor = ({ socketRef, roomId }) => {
       socketRef.current.on(ACTIONS.CODE_CHANGE, handleCodeChange);
 
       return () => {
-        socketRef.current.off(ACTIONS.CODE_CHANGE, handleCodeChange);
+        socketRef.current.off(ACTIONS.CODE_CHANGE);
       };
     }
   }, [socketRef.current]);
