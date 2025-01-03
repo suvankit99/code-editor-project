@@ -121,7 +121,7 @@ const Editor = () => {
 
       {/* Editor Area */}
       <div className="editor-area">
-        <RealtimeEditor />
+        <RealtimeEditor socketRef={socketRef} roomId={roomId}/>
       </div>
       <Toaster position="top-right" />
     </div>
