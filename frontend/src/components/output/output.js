@@ -11,7 +11,7 @@ const Output = ({ code }) => {
     setIsExecuting(true);
 
     try {
-      const response = await fetch('http://localhost:5000/execute', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/execute`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
