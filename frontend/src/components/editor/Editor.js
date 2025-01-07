@@ -15,6 +15,7 @@ import {
 import ACTIONS from "../../actions";
 import toast, { Toaster } from "react-hot-toast";
 import { io } from "socket.io-client";
+import Output from "../output/output";
 
 const Editor = () => {
   const socketRef = useRef();
@@ -54,7 +55,6 @@ const Editor = () => {
             username !== location.state?.username &&
             socketRef.current.id !== joinedUserSocketId
           ) {
-            console.log("toast called");
             toast.success(`${username} has joined the room`);
           }
 
@@ -93,7 +93,7 @@ const Editor = () => {
         <div className="upper-container">
           <div className="project-title">
             <FontAwesomeIcon icon={faCode} className="editor-icon" />
-            <h2>Code Editor</h2>
+            <h2>Codebrew</h2>
           </div>
           <div className="display-clients">
             <h3>Connected</h3>
@@ -126,6 +126,9 @@ const Editor = () => {
       {/* Editor Area */}
       <div className="editor-area">
         <RealtimeEditor socketRef={socketRef} roomId={roomId} syncCodeOnJoin={code => codeRef.current = code } />
+      </div>
+      <div className="output-area">
+      <Output code={codeRef} />
       </div>
       <Toaster position="top-right" />
     </div>

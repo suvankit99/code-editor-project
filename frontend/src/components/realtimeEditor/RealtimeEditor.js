@@ -30,7 +30,6 @@ const RealtimeEditor = ({ socketRef, roomId , syncCodeOnJoin }) => {
           // Emit local changes
           if (update.docChanged && !suppressEmit.current) {
             const newContent = update.state.doc.toString();
-            console.log('Document updated locally:', newContent);
             syncCodeOnJoin(newContent) ; 
             if (socketRef.current) {
               socketRef.current.emit(ACTIONS.CODE_CHANGE, {
@@ -58,7 +57,6 @@ const RealtimeEditor = ({ socketRef, roomId , syncCodeOnJoin }) => {
     if (socketRef.current) {
       // Listen for CODE_CHANGE events
       const handleCodeChange = ({ content }) => {
-        console.log('Received remote update:', content);
         syncCodeOnJoin(content) ; 
         if (editorViewRef.current) {
           const currentDoc = editorViewRef.current.state.doc.toString();
@@ -85,7 +83,7 @@ const RealtimeEditor = ({ socketRef, roomId , syncCodeOnJoin }) => {
     <div
       id="realtime-editor"
       ref={editorRef}
-      style={{ height: 'calc(100vh - 20px)', backgroundColor: '#1e1e1e', margin: 0 }}
+      style={{ height: 'calc(100vh - 20px)', backgroundColor: '#1e1e1e', margin: 0 ,  width:"100%"}}
     ></div>
   );
 };

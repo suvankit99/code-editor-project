@@ -1,45 +1,49 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid'; // Import the UUID generator
-import './home.css';
-import {Toaster , toast} from "react-hot-toast"
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { v4 as uuidv4 } from "uuid"; // Import the UUID generator
+import "./home.css";
+import { Toaster, toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { faCode } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 const RoomForm = () => {
-  const [roomId, setRoomId] = useState('');
-  const [username, setUsername] = useState('');
-  const navigate = useNavigate() ; 
+  const [roomId, setRoomId] = useState("");
+  const [username, setUsername] = useState("");
+  const navigate = useNavigate();
   const handleCreateRoom = () => {
     const newRoomId = uuidv4(); // Generate a new UUID
     setRoomId(newRoomId); // Update the state
-    toast.success("New room created")
+    toast.success("New room created");
   };
 
   const handleJoinRoom = () => {
-    if(!roomId){
-      toast.error("Room Id is required") ; 
-      return ; 
+    if (!roomId) {
+      toast.error("Room Id is required");
+      return;
     }
 
-    if(!username){
-      toast.error("Username is required") ; 
-      return ; 
+    if (!username) {
+      toast.error("Username is required");
+      return;
     }
-    console.log(`Joining Room: ${roomId}, Username: ${username}`);
-    navigate(`/editor/${roomId}` , {
-      state : {
-        username
-      }
-    })
+    navigate(`/editor/${roomId}`, {
+      state: {
+        username,
+      },
+    });
   };
 
   const handleEnter = (e) => {
-    if(e.code === 'Enter'){
-      handleJoinRoom() ; 
+    if (e.code === "Enter") {
+      handleJoinRoom();
     }
-  }
+  };
   return (
     <div className="room-form-container">
       <div className="form-box">
-        <h2>Room Management</h2>
+        <div className="home-header">
+          <FontAwesomeIcon icon={faCode} className="editor-icon" />
+          <h1>Codebrew</h1>
+        </div>
         <form>
           <div className="form-group">
             <label htmlFor="roomId">Room ID</label>
@@ -67,7 +71,11 @@ const RoomForm = () => {
             <button type="button" onClick={handleJoinRoom} className="btn join">
               JOIN
             </button>
-            <button type="button" onClick={handleCreateRoom} className="btn create">
+            <button
+              type="button"
+              onClick={handleCreateRoom}
+              className="btn create"
+            >
               CREATE ROOM
             </button>
           </div>
