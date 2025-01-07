@@ -6,7 +6,7 @@ require("dotenv").config(); // Import and configure dotenv
 
 const bodyParser = require('body-parser');
 const vm = require('vm');  // VM module for sandboxed execution
-
+const path = require('path');
 const app = express();
 const server = http.createServer(app);
 const ACTIONS = require("./actions");
@@ -16,7 +16,7 @@ app.use(bodyParser.json());
 // Use CORS middleware to allow cross-origin requests
 app.use(
   cors({
-    origin: "http://localhost:3000", // Replace with your client app URL (e.g., React app running on localhost:3000)
+    origin: process.env.CLIENT_URL, // Replace with your client app URL (e.g., React app running on localhost:3000)
     methods: ["GET", "POST"],
     allowedHeaders: ["Content-Type"],
   })
@@ -130,8 +130,6 @@ app.post('/execute', (req, res) => {
   const executionResult = executeCode(code);
   res.json(executionResult); // Send result back to frontend
 });
-
-const path = require('path');
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../frontend/build')));
