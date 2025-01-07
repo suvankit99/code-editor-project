@@ -131,6 +131,16 @@ app.post('/execute', (req, res) => {
   res.json(executionResult); // Send result back to frontend
 });
 
+const path = require('path');
+
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+// Catch-all route to serve the React app for any unmatched routes
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+});
+
 const PORT = process.env.PORT || 5000;
 // Start the server
 server.listen(PORT, () => {
